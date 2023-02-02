@@ -46,7 +46,31 @@ describe("Endpoints", () => {
         "Sasha is a beautiful black pooodle mix.  She is a great companion for her family."
       );
     });
+  });
 
-    it("POST /dogs/:id")
+  describe("Test POST /dogs", () => {
+    it("should create a dog and return it", async () => {
+      const response = await request(app).post("/dogs").send({ name: "Fido", breed: "Labrador" });
+
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty("id");
+      expect(response.body).toHaveProperty("name", "Fido");
+      expect(response.body).toHaveProperty("breed", "Labrador");
+
+      const dog = await Dog.findByPk(response.body.id);
+
+      expect(dog).toHaveProperty("name", "Fido");
+      expect(dog).toHaveProperty("breed", "Labrador");
+    });
+  });
+
+  describe("Test DELETE /dogs/:id", () => {
+    it("shoudl respond with status 200 and deleted data", async () => {
+      const response = await request(app).delete("/dogs/1");
+      expect(response.status).toBe(200);
+
+      const dog = await Dog.findByPk(1);
+      expect(dog).toBe(null);
+    });
   });
 });
